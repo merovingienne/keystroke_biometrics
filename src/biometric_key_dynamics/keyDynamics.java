@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-import static java.nio.file.Files.exists;
 import java.util.HashMap;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+
 
 /**
  * @author Chanuka Wijayakoon

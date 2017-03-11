@@ -1,19 +1,10 @@
 package biometric_key_dynamics;
 
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import static biometric_key_dynamics.util.*;
 
 /**
  * @author Chanuka Wijayakoon
@@ -24,7 +15,6 @@ public class keyCombination implements Serializable {
     private HashMap<ArrayList<Integer>, Long> digraphs;
     private String owner;
     private long avgFlightTime;
-    private static final String folderPath = "identities/";
 
     public keyCombination(String owner) {
         this.owner = owner;
@@ -69,13 +59,12 @@ public class keyCombination implements Serializable {
                 return false;
             }
 
-            
             flightTime = (flightTime + digraphs.get(keys)) / 2;
             digraphs.put(keys, flightTime);
             return true;
 
         }
-        
+
         flightTime = (flightTime + digraphs.get(keys)) / 2;
         digraphs.put(keys, flightTime);
         return true;
@@ -94,84 +83,38 @@ public class keyCombination implements Serializable {
 
     public void clear() {
         this.keyMap.clear();
+        this.digraphs.clear();
     }
-    
-    public void setKeyMap(HashMap<Integer, Long> keyMap){
+
+    public void setKeyMap(HashMap<Integer, Long> keyMap) {
         this.keyMap = keyMap;
     }
-    
-    public void setDigraphs(HashMap<ArrayList<Integer>, Long> digraphs){
+
+    public void setDigraphs(HashMap<ArrayList<Integer>, Long> digraphs) {
         this.digraphs = digraphs;
     }
-    
-    public void setAft(long aft){
+
+    public void setAft(long aft) {
         this.avgFlightTime = aft;
     }
-    
-    public static keyCombination open(String username){
-        File test = new File(folderPath + username + "-aft.ser");
-        
-        if (test.exists()){
+
+    public static keyCombination open(String username) {
+        boolean user_exists = util.checkUsername(username);
+
+        if (user_exists) {
             long aft_loaded = (long) openFile(username, "aft");
-            HashMap<Integer, Long> keyMap_loaded = (HashMap<Integer, Long>) openFile(username, "keymap" );
+            HashMap<Integer, Long> keyMap_loaded = (HashMap<Integer, Long>) openFile(username, "keymap");
             HashMap<ArrayList<Integer>, Long> digraphs_loaded = (HashMap<ArrayList<Integer>, Long>) openFile(username, "digraphs");
             keyCombination kc = new keyCombination(username);
-            
+
             kc.setKeyMap(keyMap_loaded);
             kc.setDigraphs(digraphs_loaded);
             kc.setAft(aft_loaded);
-            
+
             return kc;
         }
-        
+
         return null;
     }
-    
-    public static Object openFile(String owner, String fileName){
-        FileInputStream fileInputStream = null;
-        ObjectInputStream objectInputStream = null;
-        
-        try {
-            fileInputStream = new FileInputStream(folderPath + owner + "-" + fileName + ".ser");
-            objectInputStream = new ObjectInputStream(fileInputStream);
-            
-            Object obj = objectInputStream.readObject();
-            return obj;
-        }catch (Exception ex){
-            System.out.println(ex.getMessage());
-        }
-        
-        return true;
-    }
 
-    public boolean writeFile(String owner, String fileName, Object obj) {
-        FileOutputStream fileOutputStream = null;
-        ObjectOutputStream objectOutputStream = null;
-        
-        File idDir = new File("identities");
-        
-        if (!idDir.exists()){
-            idDir.mkdir();
-        }
-        
-        try {
-            fileOutputStream = new FileOutputStream(folderPath + owner + "-" +fileName + ".ser");
-            objectOutputStream = new ObjectOutputStream(fileOutputStream);
-
-            objectOutputStream.writeObject(obj);
-            return true;
-        } catch (Exception ex) {
-            Logger.getLogger(keyCombination.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println(ex.getMessage());
-            return false;
-        } finally {
-            try {
-                fileOutputStream.close();
-                objectOutputStream.close();
-            } catch (IOException ex) {
-                Logger.getLogger(keyCombination.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println(ex.getMessage());
-            }
-        }
-    }
 }
