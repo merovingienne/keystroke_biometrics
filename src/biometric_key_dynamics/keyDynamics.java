@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
 
-
 /**
  * @author Chanuka Wijayakoon
  */
@@ -21,7 +20,7 @@ public class keyDynamics {
     private int lastKey = -1;
     private long keyDownTime = -1, keyUpTime = -1;
     private keyCombination kc;
-    
+
     private boolean verified = false;
 
     private HashMap<Integer, Long> verifyKeyLog;
@@ -48,6 +47,82 @@ public class keyDynamics {
         frame.add(loginScreen());
 
         frame.setVisible(true);
+    }
+
+    /**
+     * login screen *
+     */
+    private JPanel loginScreen() {
+        loginScreen = new JPanel(null);
+        loginScreen.setSize(WIDTH, HEIGHT);
+
+        JLabel usernameLabel = new JLabel("Username:");
+        usernameLabel.setBounds(40, 50, 100, 20);
+
+        JTextField username = new JTextField();
+        username.setBounds(200, 50, 100, 20);
+
+        JButton loginButton = new JButton("Login");
+        loginButton.setBounds(320, 50, 80, 25);
+
+        JLabel loginFailure = new JLabel("No such account!");
+        loginFailure.setBounds(420, 50, 120, 25);
+        loginFailure.setVisible(false);
+
+        JButton trainButton = new JButton("Train new user");
+        trainButton.setBounds(260, 150, 120, 25);
+
+        JLabel instructions = new JLabel("Instructions");
+        instructions.setBounds(40, 200, 100, 30);
+
+        JLabel instruction1 = new JLabel("*If you already have an account, enter username at top.");
+        instruction1.setBounds(40, 240, 560, 20);
+
+        JLabel instruction2 = new JLabel("*To register and train new account, click 'Train new user'.");
+        instruction2.setBounds(40, 260, 560, 20);
+
+        JLabel instruction3 = new JLabel("*This app uses key dwell time (time a"
+                + " key is kept pressed down) to identify users.");
+        instruction3.setBounds(40, 280, 560, 20);
+
+        loginScreen.add(usernameLabel);
+        loginScreen.add(username);
+        loginScreen.add(loginButton);
+        loginScreen.add(loginFailure);
+        loginScreen.add(trainButton);
+        loginScreen.add(instructions);
+        loginScreen.add(instruction1);
+        loginScreen.add(instruction2);
+        loginScreen.add(instruction3);
+
+        loginScreen.setVisible(true);
+
+        trainButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                trainScreen = trainScreen();
+                loginScreen.setVisible(false);
+
+            }
+        });
+
+        loginButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                kc = keyCombination.open(username.getText());
+
+                if (kc != null) {
+                    verifyScreen = verifyScreen(true);
+                    loginScreen.setVisible(false);
+                } else {
+                    loginFailure.setVisible(true);
+                }
+            }
+        });
+
+        return loginScreen;
     }
 
     /**
@@ -93,7 +168,7 @@ public class keyDynamics {
 
         JButton clearButton = new JButton("Clear");
         clearButton.setBounds(500, 230, 80, 20);
-        
+
         JButton backButton = new JButton("Back");
         backButton.setBounds(40, 230, 80, 20);
 
@@ -121,14 +196,14 @@ public class keyDynamics {
          * username field *
          */
         username.addKeyListener(new KeyAdapter() {
-            
+
             @Override
-            public void keyReleased(KeyEvent evt){
+            public void keyReleased(KeyEvent evt) {
                 String un = username.getText();
                 boolean exists = util.checkUsername(un);
-                if (un.length() > 0 && (!exists)){
+                if (un.length() > 0 && (!exists)) {
                     verifyB.setEnabled(true);
-                }else{
+                } else {
                     verifyB.setEnabled(false);
                 }
             }
@@ -209,7 +284,7 @@ public class keyDynamics {
                 testText.setText("");
             }
         });
-        
+
         /* Action listener for back button */
         backButton.addActionListener(new ActionListener() {
 
@@ -239,7 +314,7 @@ public class keyDynamics {
         verifyKeyCount = new HashMap();
         verifyKeyDuration = new HashMap();
         vkc = new keyCombination("runner");
-        
+
         JButton backButton = new JButton();
         backButton.setBounds(40, 250, 80, 20);
         backButton.setText("Back");
@@ -262,12 +337,12 @@ public class keyDynamics {
         JButton saveButton = new JButton("Save");
         saveButton.setBounds(500, 280, 80, 20);
         saveButton.setEnabled(false);
-        
+
         JLabel instructions = new JLabel("Instructions");
         instructions.setBounds(40, 300, 100, 20);
-        
-        JLabel instruction1 = new JLabel("*Please press 'Clear' before trying"+
-                " to verify again. Deleting text won't reset system.");
+
+        JLabel instruction1 = new JLabel("*Please press 'Clear' before trying"
+                + " to verify again. Deleting text won't reset system.");
         instruction1.setBounds(40, 330, 560, 20);
 
         verifyScreen.add(verifyText);
@@ -291,10 +366,10 @@ public class keyDynamics {
             @Override
             public void actionPerformed(ActionEvent e) {
                 verifyScreen.setVisible(false);
-                if (isFromLogin){
+                if (isFromLogin) {
                     loginScreen.setVisible(true);
-                }else{
-                trainScreen.setVisible(true);
+                } else {
+                    trainScreen.setVisible(true);
                 }
             }
         });
@@ -311,7 +386,7 @@ public class keyDynamics {
                 HashMap<Integer, Long> deviations = new HashMap();
                 boolean empty = true;
 
-                if (okc.size() > 10 && tkc.size()>10) {
+                if (okc.size() > 10 && tkc.size() > 10) {
                     empty = false;
                 }
 
@@ -398,12 +473,12 @@ public class keyDynamics {
                 verification.setVisible(false);
             }
         });
-        
+
         saveButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (verified){
+                if (verified) {
                     kc.save();
                 }
             }
@@ -411,79 +486,6 @@ public class keyDynamics {
 
         return verifyScreen;
 
-    }
-
-    private JPanel loginScreen() {
-        loginScreen = new JPanel(null);
-        loginScreen.setSize(WIDTH, HEIGHT);
-
-        JLabel usernameLabel = new JLabel("Username:");
-        usernameLabel.setBounds(40, 50, 100, 20);
-
-        JTextField username = new JTextField();
-        username.setBounds(200, 50, 100, 20);
-
-        JButton loginButton = new JButton("Login");
-        loginButton.setBounds(320, 50, 80, 25);
-        
-        JLabel loginFailure = new JLabel("No such account!");
-        loginFailure.setBounds(420, 50, 120, 25);
-        loginFailure.setVisible(false);
-
-        JButton trainButton = new JButton("Train new user");
-        trainButton.setBounds(260, 150, 120, 25);
-
-        JLabel instructions = new JLabel("Instructions");
-        instructions.setBounds(40, 200, 100, 30);
-
-        JLabel instruction1 = new JLabel("*If you already have an account, enter username at top.");
-        instruction1.setBounds(40, 240, 560, 20);
-
-        JLabel instruction2 = new JLabel("*To register and train new account, click 'Train new user'.");
-        instruction2.setBounds(40, 260, 560, 20);
-        
-        JLabel instruction3 = new JLabel ("*This app uses key dwell time (time a"+
-                " key is kept pressed down) to identify users.");
-        instruction3.setBounds(40, 280, 560, 20);
-
-        loginScreen.add(usernameLabel);
-        loginScreen.add(username);
-        loginScreen.add(loginButton);
-        loginScreen.add(loginFailure);
-        loginScreen.add(trainButton);
-        loginScreen.add(instructions);
-        loginScreen.add(instruction1);
-        loginScreen.add(instruction2);
-        loginScreen.add(instruction3);
-
-        loginScreen.setVisible(true);
-
-        trainButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                trainScreen = trainScreen();
-                loginScreen.setVisible(false);
-
-            }
-        });
-        
-        loginButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                kc = keyCombination.open(username.getText());
-                
-                if (kc != null){
-                verifyScreen = verifyScreen(true);
-                loginScreen.setVisible(false);
-                }else{
-                    loginFailure.setVisible(true);
-                }
-            }
-        });
-
-        return loginScreen;
     }
 
     public static void main(String[] args) {

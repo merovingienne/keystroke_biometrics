@@ -26,6 +26,11 @@ public class keyCombination implements Serializable {
         this.owner = username;
     }
 
+    /**
+     * dwell time record. gets the average of last dwell time recorded for a key
+     * and the latest.
+     *
+     */
     public boolean addKey(int keyCode, long dwellTime) {
         try {
             if (keyMap.containsKey(keyCode)) {
@@ -52,6 +57,10 @@ public class keyCombination implements Serializable {
 
     }
 
+    /**
+     * flight time measure. Required for digraph & trigraph measurements. NOT
+     * IMPLEMENTED YET.
+     */
     public boolean addKeyPair(ArrayList<Integer> keys, long flightTime) {
         if (digraphs.containsKey(keys)) {
             if (Math.abs(digraphs.get(keys) - flightTime) > 500000000) {
@@ -71,6 +80,9 @@ public class keyCombination implements Serializable {
 
     }
 
+    /**
+     * Save keystroke dynamics of a user.*
+     */
     public void save() {
         writeFile(owner, "keymap", this.keyMap);
         writeFile(owner, "digraphs", this.digraphs);
